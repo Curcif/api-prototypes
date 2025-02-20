@@ -3,6 +3,7 @@ using Ambev.DeveloperEvaluation.Application.Sales.CreateSale;
 using Ambev.DeveloperEvaluation.Application.Sales.DeleteSale;
 using Ambev.DeveloperEvaluation.Application.Sales.GetSale;
 using Ambev.DeveloperEvaluation.Application.Sales.GetSales;
+using Ambev.DeveloperEvaluation.Application.Sales.UpdateSale;
 using Ambev.DeveloperEvaluation.WebApi.Common;
 using Ambev.DeveloperEvaluation.WebApi.Features.Sales.CreateSale;
 using Ambev.DeveloperEvaluation.WebApi.Features.Sales.CreateSale;
@@ -53,6 +54,31 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales
                 return BadRequest(validationResult.Errors);
 
             var command = _mapper.Map<CreateSaleCommand>(request);
+            var response = await _mediator.Send(command, cancellationToken);
+
+            return Created(string.Empty, new ApiResponseWithData<CreateSaleResponse>
+            {
+                Success = true,
+                Message = "Sale created successfully",
+                Data = _mapper.Map<CreateSaleResponse>(response)
+            });
+        }
+
+        /// <summary>
+        /// Creates a new sale
+        /// </summary>
+        /// <param name="request">The sale creation request</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>The created sale details</returns>
+        [HttpPut("{id}")]
+        [ProducesResponseType(typeof(ApiResponseWithData<CreateSaleResponse>), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> UpdateSale(int id, [FromBody] UpdateSaleCommand request, CancellationToken cancellationToken)
+        {
+            if (id != request.SaleId)
+                return BadRequest("ID in request body does not match ID in URL");
+
+            var command = _mapper.Map<UpdateSaleCommand>(request);
             var response = await _mediator.Send(command, cancellationToken);
 
             return Created(string.Empty, new ApiResponseWithData<CreateSaleResponse>
