@@ -1,12 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Ambev.DeveloperEvaluation.Application.Sales.GetSales;
+using Ambev.DeveloperEvaluation.Domain.Entities;
+using AutoMapper;
 
 namespace Ambev.DeveloperEvaluation.Application.Sales.UpdateSale
 {
-    internal class UpdateSaleProfile
+    public class UpdateSaleProfile : Profile
     {
+        public UpdateSaleProfile()
+        {
+            CreateMap<Sale, UpdateSaleResult>();
+        }
     }
 }

@@ -47,7 +47,31 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.UpdateSale
             if (!validationResult.IsValid)
                 throw new ValidationException(validationResult.Errors);
 
-            var sale = _mapper.Map<Sale>(command);
+            var sale = await _saleRepository.GetByIdAsync(command.SaleId, cancellationToken);
+            if (sale == null)
+                throw new KeyNotFoundException($"Sale with ID {command.SaleId} not found");
+
+            decimal totalAmount = 0;
+            foreach (var item in command.Items)
+            {
+                decimal discount = item.Quantity switch
+                {
+                    >= 10 => 0.20m,
+                    >= 4 => 0.10m,
+                    _ => 0m
+                };
+
+                totalAmount += item.Quantity * item.UnitPrice * (1 - discount);
+            }
+
+            sale.Date = command.Date;
+            sale.Customer = command.Customer;
+            sale.Branch = command.Branch;
+            sale.Products = string.Join(", ", command.Items.Select(i => i.Product));
+            sale.Quantities = command.Items.Sum(i => i.Quantity);
+            sale.UnitPrices = command.Items.Average(i => i.UnitPrice);
+            sale.TotalAmount = totalAmount;
+
 
             var updatedSale = await _saleRepository.UpdateAsync(sale, cancellationToken);
             var result = _mapper.Map<UpdateSaleResult>(updatedSale);

@@ -41,18 +41,6 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.UpdateSale
         /// </summary>
         public string Branch { get; set; } = string.Empty;
         /// <summary>
-        /// Gets or sets products
-        /// </summary>
-        public string Products { get; set; } = string.Empty;
-        /// <summary>
-        /// Gets or sets quantity of items in the cart
-        /// </summary>
-        public int? Quantities { get; set; }
-        /// <summary>
-        /// Gets or sets the unit price from the product
-        /// </summary>
-        public decimal? UnitPrices { get; set; }
-        /// <summary>
         /// Gets or sets the discount value applied to the sale
         /// </summary>
         public decimal? Discounts { get; set; }
@@ -81,6 +69,11 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.UpdateSale
         /// </summary>
         public bool? ItemCancelled { get; set; }
 
+        /// <summary>
+        /// A list of items with products, quantities and unit prices
+        /// </summary>
+        public List<SaleItemDto> Items { get; set; } = new();
+
         public ValidationResultDetail Validate()
         {
             var validator = new UpdateSaleCommandValidator();
@@ -91,5 +84,20 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.UpdateSale
                 Errors = result.Errors.Select(o => (ValidationErrorDetail)o)
             };
         }
+    }
+    public class SaleItemDto
+    {
+        /// <summary>
+        /// Gets or sets products
+        /// </summary>
+        public string Product { get; set; } = string.Empty;
+        /// <summary>
+        /// Gets or sets quantity of items in the cart
+        /// </summary>
+        public int Quantity { get; set; }
+        /// <summary>
+        /// Gets or sets the unit price from the product
+        /// </summary>
+        public decimal UnitPrice { get; set; }
     }
 }
