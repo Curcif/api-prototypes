@@ -54,6 +54,11 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.UpdateSale
             decimal totalAmount = 0;
             foreach (var item in command.Items)
             {
+                if (item.Quantity > 20)
+                {
+                    throw new ValidationException($"Quantity for product '{item.Product}' cannot exceed 20.");
+                }
+
                 decimal discount = item.Quantity switch
                 {
                     >= 10 => 0.20m,

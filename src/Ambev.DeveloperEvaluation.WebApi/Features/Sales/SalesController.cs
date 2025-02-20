@@ -69,8 +69,8 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>The created sale details</returns>
         [HttpPut("{id}")]
-        [ProducesResponseType(typeof(ApiResponseWithData<CreateSaleResponse>), StatusCodes.Status201Created)]
-        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ApiResponseWithData<CreateSaleResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status204NoContent)]
         public async Task<IActionResult> UpdateSale(int id, [FromBody] UpdateSaleCommand request, CancellationToken cancellationToken)
         {
             if (id != request.SaleId)

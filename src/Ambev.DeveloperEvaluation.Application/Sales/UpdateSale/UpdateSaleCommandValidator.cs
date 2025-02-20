@@ -21,10 +21,11 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.UpdateSale
         public UpdateSaleCommandValidator()
         {
             RuleFor(sale => sale.SaleId).NotEmpty();
-            RuleFor(sale => sale.Products).NotEmpty();
-            RuleFor(sale => sale.Quantities).NotEmpty();
             RuleFor(sale => sale.TotalAmount).NotEmpty();
+            RuleFor(sale => sale.Branch).NotEmpty();
             RuleFor(sale => sale.Customer).NotEmpty();
+            RuleFor(sale => sale.Items).NotEmpty().WithMessage("At least one item is required.");
+            RuleForEach(sale => sale.Items).SetValidator(new SaleItemDtoValidator());
         }
     }
 }
