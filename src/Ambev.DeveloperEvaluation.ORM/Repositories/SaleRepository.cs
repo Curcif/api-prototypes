@@ -1,12 +1,6 @@
 ﻿using Ambev.DeveloperEvaluation.Domain.Entities;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
-using Ambev.DeveloperEvaluation.ORM;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ambev.DeveloperEvaluation.ORM.Repositories
 {
@@ -45,9 +39,9 @@ namespace Ambev.DeveloperEvaluation.ORM.Repositories
         /// <param name="id">The unique identifier of the sale</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>The sale if found, null otherwise</returns>
-        public async Task<Sale?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+        public async Task<Sale?> GetByIdAsync(int? id, CancellationToken cancellationToken = default)
         {
-            return await _context.Sales.FirstOrDefaultAsync(o => o.Id == id, cancellationToken);
+            return await _context.Sales.FirstOrDefaultAsync(o => o.SaleId == id, cancellationToken);
         }
 
         /// <summary>
@@ -56,7 +50,7 @@ namespace Ambev.DeveloperEvaluation.ORM.Repositories
         /// <param name="id">The unique identifier of the sale to delete</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>True if the sale was deleted, false if not found</returns>
-        public async Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
+        public async Task<bool> DeleteAsync(int? id, CancellationToken cancellationToken = default)
         {
             var sale = await GetByIdAsync(id, cancellationToken);
             if (sale == null)
