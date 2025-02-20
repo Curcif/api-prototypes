@@ -97,7 +97,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales
         [ProducesResponseType(typeof(ApiResponseWithData<GetSaleResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetSale([FromRoute] Guid id, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetSale([FromRoute] int id, CancellationToken cancellationToken)
         {
             var request = new GetSaleRequest { Id = id };
             var validator = new GetSaleRequestValidator();

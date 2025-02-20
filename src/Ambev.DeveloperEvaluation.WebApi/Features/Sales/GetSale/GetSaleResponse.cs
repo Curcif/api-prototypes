@@ -2,7 +2,6 @@
 {
     public class GetSaleResponse
     {
-         {
         /// <summary>
         /// Sale's date
         /// </summary>
