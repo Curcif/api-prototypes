@@ -13,12 +13,27 @@ namespace Ambev.DeveloperEvaluation.Domain.Repositories
         Task<Sale> CreateAsync(Sale sale, CancellationToken cancellationToken = default);
 
         /// <summary>
+        /// Updates an existing sale in the database
+        /// </summary>
+        /// <param name="sale">The sale to update</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>The created sale</returns>
+        Task<Sale> UpdateAsync(Sale sale, CancellationToken cancellationToken = default);
+
+        /// <summary>
         /// Retrieves a sale by their unique identifier
         /// </summary>
         /// <param name="id">The unique identifier of the sale</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>The sale if found, null otherwise</returns>
         Task<Sale?> GetByIdAsync(int? id, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Retrieves all sales
+        /// </summary>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>List of all sales</returns>
+        Task<List<Sale>> GetAllAsync(CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Deletes a sale from the repository
