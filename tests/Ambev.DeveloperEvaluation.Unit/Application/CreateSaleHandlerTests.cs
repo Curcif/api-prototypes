@@ -210,17 +210,21 @@ namespace Ambev.DeveloperEvaluation.Unit.Application
 
             var createSaleResult = new CreateSaleResult { Id = (int)sale.SaleId, TotalAmount = sale.TotalAmount };
 
+            // Configuração do AutoMapper
+            var config = new MapperConfiguration(cfg => cfg.AddProfile<CreateSaleProfile>());
+            var mapper = config.CreateMapper();
+
             _mockSaleRepository
                 .Setup(repo => repo.CreateAsync(It.IsAny<Sale>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(sale);
 
             _mockMapper
-                .Setup(mapper => mapper.Map<Sale>(command))
-                .Returns(sale);
+                .Setup(m => m.Map<Sale>(It.IsAny<CreateSaleCommand>()))
+                .Returns((CreateSaleCommand cmd) => mapper.Map<Sale>(cmd));
 
             _mockMapper
-                .Setup(mapper => mapper.Map<CreateSaleResult>(sale))
-                .Returns(createSaleResult);
+                .Setup(m => m.Map<CreateSaleResult>(It.IsAny<Sale>()))
+                .Returns((Sale sale) => mapper.Map<CreateSaleResult>(sale));
 
             var handler = new CreateSaleHandler(_mockSaleRepository.Object, _mockMapper.Object);
 
