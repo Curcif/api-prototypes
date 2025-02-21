@@ -77,7 +77,6 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.UpdateSale
             sale.UnitPrices = command.Items.Average(i => i.UnitPrice);
             sale.TotalAmount = totalAmount;
 
-
             var updatedSale = await _saleRepository.UpdateAsync(sale, cancellationToken);
             var result = _mapper.Map<UpdateSaleResult>(updatedSale);
             return result;

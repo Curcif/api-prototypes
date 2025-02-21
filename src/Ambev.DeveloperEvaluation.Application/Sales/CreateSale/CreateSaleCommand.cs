@@ -46,6 +46,10 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale
         /// </summary>
         public string Branch { get; set; } = string.Empty;
         /// <summary>
+        /// Gets or sets the list of items in the sale.
+        /// </summary>
+        public List<SaleItemDto> Items { get; set; } = new();
+        /// <summary>
         /// Gets or sets products
         /// </summary>
         public string Products { get; set; } = string.Empty;
@@ -96,5 +100,25 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale
                 Errors = result.Errors.Select(o => (ValidationErrorDetail)o)
             };
         }
+    }
+    /// <summary>
+    /// Represents an item in the sale.
+    /// </summary>
+    public class SaleItemDto
+    {
+        /// <summary>
+        /// Gets or sets the product name.
+        /// </summary>
+        public string Product { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Gets or sets the quantity of the product.
+        /// </summary>
+        public int Quantity { get; set; }
+
+        /// <summary>
+        /// Gets or sets the unit price of the product.
+        /// </summary>
+        public decimal UnitPrice { get; set; }
     }
 }
