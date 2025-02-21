@@ -14,17 +14,18 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales.CreateSale
         /// <remarks>
         /// Validation rules include:
         /// - Branch: Must not be null or empty
-        /// - Products: Must not be null or empty
-        /// - Quantities: Must not be null or empty or zero
-        /// - TotalAmount: Must not be null or empty or zero
         /// - Customer: Must not be null or empty
+        /// - Products: Must not be null or empty (on Items)
+        /// - Quantities: Must not be null or empty or zero (on Items)
+        /// - Unitprices: Must not be null or empty or zero (on Items)
         /// </remarks>
-        public CreateSaleRequestValidator() {
-            RuleFor(sale => sale.Branch).NotEmpty();
-            RuleFor(sale => sale.Products).NotEmpty();
-            RuleFor(sale => sale.Quantities).NotEmpty();
-            RuleFor(sale => sale.TotalAmount).NotEmpty();
-            RuleFor(sale => sale.Customer).NotEmpty();
+        public CreateSaleRequestValidator()
+        {
+            RuleFor(request => request.Branch).NotEmpty();
+            RuleFor(request => request.Customer).NotEmpty();
+            RuleFor(request => request.Items)
+                .NotEmpty().WithMessage("At least one item is required.")
+                .Must(items => items.Count <= 25).WithMessage("A sale cannot have more than 25 items.");
         }
     }
 }

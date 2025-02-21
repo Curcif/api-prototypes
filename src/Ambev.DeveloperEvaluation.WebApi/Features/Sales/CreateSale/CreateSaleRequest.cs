@@ -1,4 +1,6 @@
-﻿namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales.CreateSale
+﻿using Ambev.DeveloperEvaluation.Application.Sales.CreateSale;
+
+namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales.CreateSale
 {
     public class CreateSaleRequest
     {
@@ -23,17 +25,9 @@
         /// </summary>
         public string Branch { get; set; } = string.Empty;
         /// <summary>
-        /// Gets or sets products
+        /// Gets or sets products, quantities eand unit prices
         /// </summary>
-        public string Products { get; set; } = string.Empty;
-        /// <summary>
-        /// Gets or sets quantity of items in the cart
-        /// </summary>
-        public int? Quantities { get; set; }
-        /// <summary>
-        /// Gets or sets the unit price from the product
-        /// </summary>
-        public decimal? UnitPrices { get; set; }
+        public List<SaleItemDto> Items { get; set; } = new();
         /// <summary>
         /// Gets or sets the discount value applied to the sale
         /// </summary>

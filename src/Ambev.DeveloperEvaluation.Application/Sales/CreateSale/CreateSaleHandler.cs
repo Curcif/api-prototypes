@@ -45,19 +45,36 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale
             if (!validationResult.IsValid)
                 throw new ValidationException(validationResult.Errors);
 
-
+            // Validação do número máximo de itens
+            if (command.Items.Count > 25)
+                throw new ValidationException("A sale cannot have more than 25 items.");
 
             var existingSale = await _saleRepository.GetByIdAsync(command.SaleId, cancellationToken);
             if (existingSale != null)
                 throw new InvalidOperationException($"Sale with Id {command.SaleId} already exists");
 
+            // Calcula o TotalAmount com base nos itens e descontos
+            decimal totalAmount = CalculateTotalAmount(command.Items);
+
+            var sale = _mapper.Map<Sale>(command);
+            sale.Products = string.Join(", ", command.Items.Select(i => i.Product));
+            sale.Quantities = command.Items.Sum(i => i.Quantity);
+            sale.UnitPrices = command.Items.Average(i => i.UnitPrice);
+            sale.TotalAmount = totalAmount; // Usa o TotalAmount calculado
+
+            var createdSale = await _saleRepository.CreateAsync(sale, cancellationToken);
+
+            var result = _mapper.Map<CreateSaleResult>(createdSale);
+            return result;
+        }
+
+        private decimal CalculateTotalAmount(List<SaleItemDto> items)
+        {
             decimal totalAmount = 0;
-            foreach (var item in command.Items)
+            foreach (var item in items)
             {
                 if (item.Quantity > 20)
-                {
                     throw new ValidationException($"Quantity for product '{item.Product}' cannot exceed 20.");
-                }
 
                 decimal discount = item.Quantity switch
                 {
@@ -68,17 +85,7 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale
 
                 totalAmount += item.Quantity * item.UnitPrice * (1 - discount);
             }
-
-            var sale = _mapper.Map<Sale>(command);
-
-            sale.Products = string.Join(", ", command.Items.Select(i => i.Product));
-            sale.Quantities = command.Items.Sum(i => i.Quantity);
-            sale.UnitPrices = command.Items.Average(i => i.UnitPrice);
-
-            var createdSale = await _saleRepository.CreateAsync(sale, cancellationToken);
-
-            var result = _mapper.Map<CreateSaleResult>(createdSale);
-            return result;
+            return totalAmount;
         }
     }
 }

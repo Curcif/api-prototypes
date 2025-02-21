@@ -25,9 +25,15 @@ namespace Ambev.DeveloperEvaluation.Unit.Application.TestData
             .RuleFor(s => s.Customer, f => f.Name.FullName())
             .RuleFor(s => s.Total, f => f.Random.Decimal(10, 1000))
             .RuleFor(s => s.Branch, f => f.Company.CompanyName())
-            .RuleFor(s => s.Products, f => f.Commerce.ProductName())
-            .RuleFor(s => s.Quantities, f => f.Random.Int(1, 10))
-            .RuleFor(s => s.UnitPrices, f => f.Random.Decimal(5, 50));
+            .RuleFor(s => s.Items, f => GenerateSaleItemsForCreate())
+            .RuleFor(s => s.Discounts, f => f.Random.Decimal(0, 50))
+            .RuleFor(s => s.TotalAmount, f => f.Random.Decimal(50, 1000))
+            .RuleFor(s => s.IsCancelled, f => f.Random.Bool())
+            .RuleFor(s => s.Date, f => f.Date.Past(1))
+            .RuleFor(s => s.SaleCreated, f => f.Date.Past(1))
+            .RuleFor(s => s.SaleModified, f => f.Date.Recent())
+            .RuleFor(s => s.SaleCancelled, f => f.Random.Bool() ? f.Date.Past(1) : null)
+            .RuleFor(s => s.ItemCancelled, f => f.Random.Bool());
 
         /// <summary>
         /// Configures the Faker to generate valid UpdateSaleCommand entities.
@@ -42,31 +48,47 @@ namespace Ambev.DeveloperEvaluation.Unit.Application.TestData
         /// - Dates (random dates within the last year)
         /// </summary>
         private static readonly Faker<UpdateSaleCommand> UpdateSaleCommandFaker = new Faker<UpdateSaleCommand>()
-            .RuleFor(s => s.SaleId, f => f.Random.Int(1, 100))
-            .RuleFor(s => s.Customer, f => f.Name.FullName())
-            .RuleFor(s => s.Total, f => f.Random.Decimal(10, 1000))
-            .RuleFor(s => s.Branch, f => f.Company.CompanyName())
-            .RuleFor(s => s.Discounts, f => f.Random.Decimal(0, 50))
-            .RuleFor(s => s.IsCancelled, f => f.Random.Bool())
-            .RuleFor(s => s.Date, f => f.Date.Past(1))
-            .RuleFor(s => s.SaleCreated, f => f.Date.Past(1))
-            .RuleFor(s => s.SaleModified, f => f.Date.Recent())
-            .RuleFor(s => s.SaleCancelled, f => f.Random.Bool() ? f.Date.Past(1) : null)
-            .RuleFor(s => s.ItemCancelled, f => f.Random.Bool())
-            .RuleFor(s => s.Items, f => GenerateSaleItems(f));
+                 .RuleFor(s => s.SaleId, f => f.Random.Int(1, 100))
+                 .RuleFor(s => s.Customer, f => f.Name.FullName())
+                 .RuleFor(s => s.Total, f => f.Random.Decimal(10, 1000))
+                 .RuleFor(s => s.Branch, f => f.Company.CompanyName())
+                 .RuleFor(s => s.Discounts, f => f.Random.Decimal(0, 50))
+                 .RuleFor(s => s.IsCancelled, f => f.Random.Bool())
+                 .RuleFor(s => s.Date, f => f.Date.Past(1))
+                 .RuleFor(s => s.SaleCreated, f => f.Date.Past(1))
+                 .RuleFor(s => s.SaleModified, f => f.Date.Recent())
+                 .RuleFor(s => s.SaleCancelled, f => f.Random.Bool() ? f.Date.Past(1) : null)
+                 .RuleFor(s => s.ItemCancelled, f => f.Random.Bool())
+                 .RuleFor(s => s.Items, f => GenerateSaleItemsForUpdate());
+
 
         /// <summary>
         /// Generates a list of SaleItemDto with random data.
         /// </summary>
-        /// <param name="f">The Faker instance.</param>
         /// <returns>A list of SaleItemDto with random products, quantities, and unit prices.</returns>
-        private static List<DeveloperEvaluation.Application.Sales.CreateSale.SaleItemDto> GenerateSaleItems(Faker f)
+        private static List<DeveloperEvaluation.Application.Sales.CreateSale.SaleItemDto> GenerateSaleItemsForCreate()
         {
+            var faker = new Faker();
             return new Faker<DeveloperEvaluation.Application.Sales.CreateSale.SaleItemDto>()
                 .RuleFor(i => i.Product, f => f.Commerce.ProductName())
                 .RuleFor(i => i.Quantity, f => f.Random.Int(1, 10))
                 .RuleFor(i => i.UnitPrice, f => f.Random.Decimal(5, 50))
-                .Generate(f.Random.Int(1, 5)); // Gera entre 1 e 5 itens
+                .Generate(faker.Random.Int(1, 5));
+        }
+
+
+        /// <summary>
+        /// Generates a list of SaleItemDto with random data.
+        /// </summary>
+        /// <returns>A list of SaleItemDto with random products, quantities, and unit prices.</returns>
+        private static List<DeveloperEvaluation.Application.Sales.UpdateSale.SaleItemDto> GenerateSaleItemsForUpdate()
+        {
+            var faker = new Faker();
+            return new Faker<DeveloperEvaluation.Application.Sales.UpdateSale.SaleItemDto>()
+                .RuleFor(i => i.Product, f => f.Commerce.ProductName())
+                .RuleFor(i => i.Quantity, f => f.Random.Int(1, 10))
+                .RuleFor(i => i.UnitPrice, f => f.Random.Decimal(5, 50))
+                .Generate(faker.Random.Int(1, 5));
         }
 
         /// <summary>

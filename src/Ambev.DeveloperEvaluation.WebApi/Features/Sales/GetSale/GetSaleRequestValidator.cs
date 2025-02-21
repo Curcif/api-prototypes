@@ -9,9 +9,9 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales.GetSale
     public class GetSaleRequestValidator : AbstractValidator<GetSaleRequest>
     {
         public GetSaleRequestValidator() {
-            RuleFor(x => x.Id)
-               .NotEmpty()
-               .WithMessage("Sale ID is required");
+            RuleFor(request => request.Id)
+            .NotEmpty().WithMessage("Sale ID is required.")
+            .GreaterThan(0).WithMessage("Sale ID must be greater than 0.");
         }
     }
 }

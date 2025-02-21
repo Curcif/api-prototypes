@@ -1,11 +1,4 @@
-﻿using Ambev.DeveloperEvaluation.Application.Users.CreateUser;
-using Ambev.DeveloperEvaluation.Domain.Enums;
-using FluentValidation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using FluentValidation;
 
 namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale
 {
@@ -25,12 +18,13 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale
         /// - TotalAmount: Must not be null or empty or zero
         /// - Customer: Must not be null or empty
         /// </remarks>
-        public CreateSaleCommandValidator() {
+        public CreateSaleCommandValidator()
+        {
             RuleFor(sale => sale.Branch).NotEmpty();
-            RuleFor(sale => sale.Products).NotEmpty();
-            RuleFor(sale => sale.Quantities).NotEmpty();
-            RuleFor(sale => sale.TotalAmount).NotEmpty();
             RuleFor(sale => sale.Customer).NotEmpty();
+            RuleFor(sale => sale.Items)
+                .NotEmpty().WithMessage("At least one item is required.")
+                .Must(items => items.Count <= 25).WithMessage("A sale cannot have more than 25 items.");
         }
     }
 }

@@ -79,10 +79,10 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales
             var command = _mapper.Map<UpdateSaleCommand>(request);
             var response = await _mediator.Send(command, cancellationToken);
 
-            return Created(string.Empty, new ApiResponseWithData<CreateSaleResponse>
+            return Ok(new ApiResponseWithData<CreateSaleResponse>
             {
                 Success = true,
-                Message = "Sale created successfully",
+                Message = "Sale updated successfully",
                 Data = _mapper.Map<CreateSaleResponse>(response)
             });
         }
@@ -106,7 +106,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales
             if (!validationResult.IsValid)
                 return BadRequest(validationResult.Errors);
 
-            var command = _mapper.Map<GetSaleCommand>(request.Id);
+            var command = new GetSaleCommand(request.Id);
             var response = await _mediator.Send(command, cancellationToken);
 
             return Ok(new ApiResponseWithData<GetSaleResponse>

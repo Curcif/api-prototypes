@@ -1,11 +1,5 @@
-﻿using Ambev.DeveloperEvaluation.Application.Users.CreateUser;
-using Ambev.DeveloperEvaluation.Common.Validation;
+﻿using Ambev.DeveloperEvaluation.Common.Validation;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale
 {
@@ -49,18 +43,6 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale
         /// Gets or sets the list of items in the sale.
         /// </summary>
         public List<SaleItemDto> Items { get; set; } = new();
-        /// <summary>
-        /// Gets or sets products
-        /// </summary>
-        public string Products { get; set; } = string.Empty;
-        /// <summary>
-        /// Gets or sets quantity of items in the cart
-        /// </summary>
-        public int? Quantities { get; set; }
-        /// <summary>
-        /// Gets or sets the unit price from the product
-        /// </summary>
-        public decimal? UnitPrices { get; set; }
         /// <summary>
         /// Gets or sets the discount value applied to the sale
         /// </summary>

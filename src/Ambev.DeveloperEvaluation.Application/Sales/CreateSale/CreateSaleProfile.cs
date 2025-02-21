@@ -13,8 +13,13 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale
         /// </summary>
         public CreateSaleProfile()
         {
-            CreateMap<CreateSaleCommand, Sale>();
-            CreateMap<Sale, CreateSaleResult>();
+            CreateMap<CreateSaleCommand, Sale>()
+            .ForMember(dest => dest.Products, opt => opt.MapFrom(src => string.Join(", ", src.Items.Select(i => i.Product))))
+            .ForMember(dest => dest.Quantities, opt => opt.MapFrom(src => src.Items.Sum(i => i.Quantity)))
+            .ForMember(dest => dest.UnitPrices, opt => opt.MapFrom(src => src.Items.Average(i => i.UnitPrice)));
+
+            CreateMap<Sale, CreateSaleResult>()
+                .ForMember(dest => dest.TotalAmount, opt => opt.MapFrom(src => src.TotalAmount));
         }
     }
 }
