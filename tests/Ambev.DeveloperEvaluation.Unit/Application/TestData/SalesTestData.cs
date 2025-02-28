@@ -1,5 +1,6 @@
 ﻿using Ambev.DeveloperEvaluation.Application.Sales.CreateSale;
 using Ambev.DeveloperEvaluation.Application.Sales.UpdateSale;
+using Ambev.DeveloperEvaluation.Domain.Entities;
 using Bogus;
 
 namespace Ambev.DeveloperEvaluation.Unit.Application.TestData
@@ -66,10 +67,10 @@ namespace Ambev.DeveloperEvaluation.Unit.Application.TestData
         /// Generates a list of SaleItemDto with random data.
         /// </summary>
         /// <returns>A list of SaleItemDto with random products, quantities, and unit prices.</returns>
-        private static List<DeveloperEvaluation.Application.Sales.CreateSale.SaleItemDto> GenerateSaleItemsForCreate()
+        private static List<SaleItemDto> GenerateSaleItemsForCreate()
         {
             var faker = new Faker();
-            return new Faker<DeveloperEvaluation.Application.Sales.CreateSale.SaleItemDto>()
+            return new Faker<SaleItemDto>()
                 .RuleFor(i => i.Product, f => f.Commerce.ProductName())
                 .RuleFor(i => i.Quantity, f => f.Random.Int(1, 10))
                 .RuleFor(i => i.UnitPrice, f => f.Random.Decimal(5, 50))
@@ -81,10 +82,10 @@ namespace Ambev.DeveloperEvaluation.Unit.Application.TestData
         /// Generates a list of SaleItemDto with random data.
         /// </summary>
         /// <returns>A list of SaleItemDto with random products, quantities, and unit prices.</returns>
-        private static List<DeveloperEvaluation.Application.Sales.UpdateSale.SaleItemDto> GenerateSaleItemsForUpdate()
+        private static List<SaleItemDto> GenerateSaleItemsForUpdate()
         {
             var faker = new Faker();
-            return new Faker<DeveloperEvaluation.Application.Sales.UpdateSale.SaleItemDto>()
+            return new Faker<SaleItemDto>()
                 .RuleFor(i => i.Product, f => f.Commerce.ProductName())
                 .RuleFor(i => i.Quantity, f => f.Random.Int(1, 10))
                 .RuleFor(i => i.UnitPrice, f => f.Random.Decimal(5, 50))
