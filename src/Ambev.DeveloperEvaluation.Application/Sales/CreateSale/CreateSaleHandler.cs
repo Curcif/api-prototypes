@@ -1,14 +1,11 @@
-﻿using Ambev.DeveloperEvaluation.Application.Users.CreateUser;
+﻿using Ambev.DeveloperEvaluation.Application.Sales.Validation;
 using Ambev.DeveloperEvaluation.Domain.Entities;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
+using Ambev.DeveloperEvaluation.Domain.Services;
 using AutoMapper;
 using FluentValidation;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale
 {
@@ -19,16 +16,25 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale
     {
         private readonly ISaleRepository _saleRepository;
         private readonly IMapper _mapper;
+        private readonly ISaleDiscountService _discountService;
+        private readonly ICreateSaleCommandValidatorService _validatorService;
+        private readonly ICreateSaleAppService _createSaleAppService;
+        private readonly ILogger<CreateSaleHandler> _logger;
         /// <summary>
         /// Initializes a new instance of CreateSaleHandler
         /// </summary>
         /// <param name="saleRepository">The sale repository</param>
         /// <param name="mapper">The AutoMapper instance</param>
-        /// <param name="validator">The validator for CreateSaleCommand</param>
-        public CreateSaleHandler(ISaleRepository saleRepository, IMapper mapper)
+        /// <param name="discountService">The service for sale that performs discount calculations</param>
+        /// <param name="validatorService">The service for sale that is responsible for validations</param>
+        public CreateSaleHandler(ISaleRepository saleRepository, IMapper mapper, ISaleDiscountService discountService, ICreateSaleCommandValidatorService validatorService, ICreateSaleAppService createSaleAppService, ILogger<CreateSaleHandler> logger)
         {
             _saleRepository = saleRepository;
             _mapper = mapper;
+            _discountService = discountService;
+            _validatorService = validatorService;
+            _createSaleAppService = createSaleAppService;
+            _logger = logger;
         }
 
         /// <summary>
@@ -39,53 +45,37 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale
         /// <returns>The created sale details</returns>
         public async Task<CreateSaleResult> Handle(CreateSaleCommand command, CancellationToken cancellationToken)
         {
-            var validator = new CreateSaleCommandValidator();
-            var validationResult = await validator.ValidateAsync(command, cancellationToken);
+            _logger.LogInformation("Handling CreateSaleCommand with SaleId: {SaleId}", command.SaleId);
 
-            if (!validationResult.IsValid)
-                throw new ValidationException(validationResult.Errors);
+            await ValidateCommandAsync(command, cancellationToken);
 
-            // Validação do número máximo de itens
-            if (command.Items.Count > 25)
-                throw new ValidationException("A sale cannot have more than 25 items.");
-
-            var existingSale = await _saleRepository.GetByIdAsync(command.SaleId, cancellationToken);
-            if (existingSale != null)
-                throw new InvalidOperationException($"Sale with Id {command.SaleId} already exists");
-
-            // Calcula o TotalAmount com base nos itens e descontos
             decimal totalAmount = CalculateTotalAmount(command.Items);
 
-            var sale = _mapper.Map<Sale>(command);
-            sale.Products = string.Join(", ", command.Items.Select(i => i.Product));
-            sale.Quantities = command.Items.Sum(i => i.Quantity);
-            sale.UnitPrices = command.Items.Average(i => i.UnitPrice);
-            sale.TotalAmount = totalAmount; // Usa o TotalAmount calculado
+            return await CreateSaleAsync(command, totalAmount, cancellationToken);
+        }
 
-            var createdSale = await _saleRepository.CreateAsync(sale, cancellationToken);
+        private async Task ValidateCommandAsync(CreateSaleCommand command, CancellationToken cancellationToken)
+        {
+            var validationResult = await _validatorService.ValidateAsync(command, cancellationToken);
 
-            var result = _mapper.Map<CreateSaleResult>(createdSale);
-            return result;
+            if (!validationResult.IsValid)
+            {
+                var errorMessages = string.Join(", ", validationResult.Errors.Select(e => e.Error));
+                _logger.LogError("Validation failed: {Errors}", errorMessages);
+                throw new ValidationException(errorMessages);
+            }
         }
 
         private decimal CalculateTotalAmount(List<SaleItemDto> items)
         {
-            decimal totalAmount = 0;
-            foreach (var item in items)
-            {
-                if (item.Quantity > 20)
-                    throw new ValidationException($"Quantity for product '{item.Product}' cannot exceed 20.");
+            return _discountService.CalculateTotalAmount(items);
+        }
 
-                decimal discount = item.Quantity switch
-                {
-                    >= 10 => 0.20m, // 20% discount for 10+ items
-                    >= 4 => 0.10m,   // 10% discount for 4+ items
-                    _ => 0m          // No discount for less than 4 items
-                };
-
-                totalAmount += item.Quantity * item.UnitPrice * (1 - discount);
-            }
-            return totalAmount;
+        private async Task<CreateSaleResult> CreateSaleAsync(CreateSaleCommand command, decimal totalAmount, CancellationToken cancellationToken)
+        {
+            _logger.LogInformation("Creating Sale");
+            var sale = await _createSaleAppService.CreateSaleAsync(command, totalAmount, cancellationToken).ConfigureAwait(false);
+            return _mapper.Map<CreateSaleResult>(sale);
         }
     }
 }
