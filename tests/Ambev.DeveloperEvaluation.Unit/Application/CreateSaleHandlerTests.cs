@@ -192,7 +192,7 @@ namespace Ambev.DeveloperEvaluation.Unit.Application
                 _mockCreateSaleAppService,
                 _mockLogger.Object);
 
-            var exception = await Assert.ThrowsAsync<Exception>(() => handler.Handle(command, CancellationToken.None));
+            var exception = await Assert.ThrowsAsync<Exception>(() => handler.Handle(command!, CancellationToken.None));
             Assert.Equal("Error while trying to save to the repository.", exception.Message);
         }
 
@@ -266,7 +266,7 @@ namespace Ambev.DeveloperEvaluation.Unit.Application
                 _mockCreateSaleAppService,
                 _mockLogger.Object);
 
-            var result = await handler.Handle(command, CancellationToken.None);
+            var result = await handler.Handle(command!, CancellationToken.None);
 
             Assert.Equal(150.00m, result.TotalAmount); // No discount applied
         }
@@ -340,7 +340,7 @@ namespace Ambev.DeveloperEvaluation.Unit.Application
                 _mockLogger.Object);
 
             // Act
-            var result = await handler.Handle(command, CancellationToken.None);
+            var result = await handler.Handle(command!, CancellationToken.None);
 
             // Assert
             Assert.Equal(225.00m, result.TotalAmount); // 10% discount applied
@@ -416,7 +416,7 @@ namespace Ambev.DeveloperEvaluation.Unit.Application
                 _mockCreateSaleAppService,
                 _mockLogger.Object);
 
-            var result = await handler.Handle(command, CancellationToken.None);
+            var result = await handler.Handle(command!, CancellationToken.None);
 
             Assert.Equal(480.00m, result.TotalAmount); // 20% discount applied
         }
