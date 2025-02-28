@@ -1,5 +1,5 @@
-﻿using Ambev.DeveloperEvaluation.Application.Sales.CreateSale;
-using Ambev.DeveloperEvaluation.Common.Validation;
+﻿using Ambev.DeveloperEvaluation.Common.Validation;
+using Ambev.DeveloperEvaluation.Domain.Entities;
 using MediatR;
 
 namespace Ambev.DeveloperEvaluation.Application.Sales.UpdateSale
@@ -84,20 +84,5 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.UpdateSale
                 Errors = result.Errors.Select(o => (ValidationErrorDetail)o)
             };
         }
-    }
-    public class SaleItemDto
-    {
-        /// <summary>
-        /// Gets or sets products
-        /// </summary>
-        public string Product { get; set; } = string.Empty;
-        /// <summary>
-        /// Gets or sets quantity of items in the cart
-        /// </summary>
-        public int Quantity { get; set; }
-        /// <summary>
-        /// Gets or sets the unit price from the product
-        /// </summary>
-        public decimal UnitPrice { get; set; }
     }
 }

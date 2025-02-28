@@ -22,14 +22,14 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales
     {
         private readonly IMediator _mediator;
         private readonly IMapper _mapper;
-        private readonly ILogger _logger;
+        private readonly ILogger<SalesController> _logger;
 
         /// <summary>
         /// Initializes a new instance of SalesController
         /// </summary>
         /// <param name="mediator">The mediator instance</param>
         /// <param name="mapper">The AutoMapper instance</param>
-        public SalesController(IMediator mediator, IMapper mapper, ILogger logger)
+        public SalesController(IMediator mediator, IMapper mapper, ILogger<SalesController> logger)
         {
             _mediator = mediator;
             _mapper = mapper;

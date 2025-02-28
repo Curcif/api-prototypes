@@ -18,6 +18,9 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale
              .ForMember(dest => dest.Quantities, opt => opt.MapFrom(src => src.Items.Sum(i => i.Quantity)))
              .ForMember(dest => dest.UnitPrices, opt => opt.MapFrom(src => src.Items.Average(i => i.UnitPrice)));
 
+            CreateMap<CreateSaleCommand, SaleCreationData>();
+            CreateMap<SaleCreationData, Sale>();
+
             CreateMap<Sale, CreateSaleResult>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.SaleId))
                 .ForMember(dest => dest.TotalAmount, opt => opt.MapFrom(src => src.TotalAmount));

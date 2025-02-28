@@ -10,7 +10,7 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.GetSale
     /// <summary>
     /// Handler for processing CreateSaleCommand requests
     /// </summary>
-    public class GetSaleHandler : IRequestHandler<CreateSaleCommand, CreateSaleResult>
+    public class GetSaleHandler : IRequestHandler<GetSaleCommand, GetSaleResult>
     {
         private readonly ISaleRepository _saleRepository;
         private readonly IMapper _mapper;
@@ -33,22 +33,17 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.GetSale
         /// <param name="command">The CreateSale command</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>The created sale details</returns>
-        public async Task<CreateSaleResult> Handle(CreateSaleCommand command, CancellationToken cancellationToken)
+        public async Task<GetSaleResult> Handle(GetSaleCommand command, CancellationToken cancellationToken)
         {
-            var validator = new CreateSaleCommandValidator();
+            var validator = new GetSaleCommandValidator();
             var validationResult = await validator.ValidateAsync(command, cancellationToken);
 
             if (!validationResult.IsValid)
                 throw new ValidationException(validationResult.Errors);
 
-            var existingSale = await _saleRepository.GetByIdAsync(command.SaleId, cancellationToken);
-            if (existingSale != null)
-                throw new InvalidOperationException($"Sale with Id {command.SaleId} already exists");
-
             var sale = _mapper.Map<Sale>(command);
 
-            var createdSale = await _saleRepository.CreateAsync(sale, cancellationToken);
-            var result = _mapper.Map<CreateSaleResult>(createdSale);
+            var result = _mapper.Map<GetSaleResult>(sale);
             return result;
         }
     }
