@@ -1,4 +1,5 @@
 ﻿using Ambev.DeveloperEvaluation.Application.Sales.Validation;
+using Ambev.DeveloperEvaluation.Domain.Entities;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
 using Ambev.DeveloperEvaluation.Domain.Services;
 using AutoMapper;
@@ -46,9 +47,15 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale
         {
             _logger.LogInformation("Handling CreateSaleCommand with SaleId: {SaleId}", command.SaleId);
 
-            //Validations
-            //CreateSaleCommandValidatorService
-            //CreateSaleCommandValidator
+            await ValidateCommandAsync(command, cancellationToken);
+
+            decimal totalAmount = CalculateTotalAmount(command.Items);
+
+            return await CreateSaleAsync(command, totalAmount, cancellationToken);
+        }
+
+        private async Task ValidateCommandAsync(CreateSaleCommand command, CancellationToken cancellationToken)
+        {
             var validationResult = await _validatorService.ValidateAsync(command, cancellationToken);
 
             if (!validationResult.IsValid)
@@ -57,15 +64,18 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale
                 _logger.LogError("Validation failed: {Errors}", errorMessages);
                 throw new ValidationException(errorMessages);
             }
+        }
 
-            //Calcs
-            decimal totalAmount = _discountService.CalculateTotalAmount(command.Items);
+        private decimal CalculateTotalAmount(List<SaleItemDto> items)
+        {
+            return _discountService.CalculateTotalAmount(items);
+        }
 
-            //Mappings
+        private async Task<CreateSaleResult> CreateSaleAsync(CreateSaleCommand command, decimal totalAmount, CancellationToken cancellationToken)
+        {
+            _logger.LogInformation("Creating Sale");
             var sale = await _createSaleAppService.CreateSaleAsync(command, totalAmount, cancellationToken).ConfigureAwait(false);
-
-            var result = _mapper.Map<CreateSaleResult>(sale);
-            return result;
+            return _mapper.Map<CreateSaleResult>(sale);
         }
     }
 }
