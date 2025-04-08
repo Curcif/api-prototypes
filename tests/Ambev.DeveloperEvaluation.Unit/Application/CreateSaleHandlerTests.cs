@@ -13,6 +13,8 @@ namespace Ambev.DeveloperEvaluation.Unit.Application
     public class CreateSaleHandlerTests
     {
         private readonly Mock<ILogger<CreateSaleHandler>> _mockLogger;
+        private readonly Mock<ILogger<CreateSaleCommandValidatorService>> _mockLoggerCommandValidator;
+        private readonly Mock<ILogger<CreateSaleAppService>> _mockLoggerSaleAppService;
         private readonly Mock<IMapper> _mockMapper;
         private readonly Mock<ISaleRepository> _mockSaleRepository;
         private ICreateSaleCommandValidatorService _validatorService;
@@ -24,13 +26,15 @@ namespace Ambev.DeveloperEvaluation.Unit.Application
         public CreateSaleHandlerTests()
         {
             _mockLogger = new Mock<ILogger<CreateSaleHandler>>();
+            _mockLoggerCommandValidator = new Mock<ILogger<CreateSaleCommandValidatorService>>();
+            _mockLoggerSaleAppService = new Mock<ILogger<CreateSaleAppService>>();
             _mockMapper = new Mock<IMapper>();
             _mockSaleRepository = new Mock<ISaleRepository>();
             _validator = new CreateSaleCommandValidator();
-            _validatorService = new CreateSaleCommandValidatorService(_validator);
+            _validatorService = new CreateSaleCommandValidatorService(_validator, _mockLoggerCommandValidator.Object);
             _discountService = new SaleDiscountService();
             _saleCreationService = new SaleCreationService(_mockSaleRepository.Object, _mockMapper.Object);
-            _mockCreateSaleAppService = new CreateSaleAppService(_mockMapper.Object, _saleCreationService);
+            _mockCreateSaleAppService = new CreateSaleAppService(_mockLoggerSaleAppService.Object, _mockMapper.Object, _saleCreationService);
 
         }
 
@@ -98,7 +102,7 @@ namespace Ambev.DeveloperEvaluation.Unit.Application
                 .Setup(mapper => mapper.Map<CreateSaleResult>(sale))
                 .Returns(createSaleResult);
 
-            _validatorService = new CreateSaleCommandValidatorService(_validator);
+            _validatorService = new CreateSaleCommandValidatorService(_validator, _mockLoggerCommandValidator.Object);
 
             var handler = new CreateSaleHandler(
                 _mockSaleRepository.Object,
@@ -182,7 +186,7 @@ namespace Ambev.DeveloperEvaluation.Unit.Application
                 .Setup(repo => repo.CreateAsync(It.IsAny<Sale>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new Exception("Error while trying to save to the repository."));
 
-            _validatorService = new CreateSaleCommandValidatorService(_validator);
+            _validatorService = new CreateSaleCommandValidatorService(_validator, _mockLoggerCommandValidator.Object);
 
             var handler = new CreateSaleHandler(
                 _mockSaleRepository.Object,

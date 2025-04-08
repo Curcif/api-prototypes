@@ -47,35 +47,10 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale
         {
             _logger.LogInformation("Handling CreateSaleCommand with SaleId: {SaleId}", command.SaleId);
 
-            await ValidateCommandAsync(command, cancellationToken);
+            await _validatorService.ValidateAsync(command, cancellationToken);
 
-            decimal totalAmount = CalculateTotalAmount(command.Items);
-
-            return await CreateSaleAsync(command, totalAmount, cancellationToken);
-        }
-
-        private async Task ValidateCommandAsync(CreateSaleCommand command, CancellationToken cancellationToken)
-        {
-            var validationResult = await _validatorService.ValidateAsync(command, cancellationToken);
-
-            if (!validationResult.IsValid)
-            {
-                var errorMessages = string.Join(", ", validationResult.Errors.Select(e => e.Error));
-                _logger.LogError("Validation failed: {Errors}", errorMessages);
-                throw new ValidationException(errorMessages);
-            }
-        }
-
-        private decimal CalculateTotalAmount(List<SaleItemDto> items)
-        {
-            return _discountService.CalculateTotalAmount(items);
-        }
-
-        private async Task<CreateSaleResult> CreateSaleAsync(CreateSaleCommand command, decimal totalAmount, CancellationToken cancellationToken)
-        {
-            _logger.LogInformation("Creating Sale");
-            var sale = await _createSaleAppService.CreateSaleAsync(command, totalAmount, cancellationToken).ConfigureAwait(false);
-            return _mapper.Map<CreateSaleResult>(sale);
+            decimal totalAmount = _discountService.CalculateTotalAmount(command.Items);
+            return await _createSaleAppService.CreateSaleAsync(command, totalAmount, cancellationToken);
         }
     }
 }
